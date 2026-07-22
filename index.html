@@ -453,7 +453,7 @@
         }
         // STABLE CONNECTIVITY LOOP OVER LOCAL NETWORKS
         function initializeWebSocket() {
-            ws = new WebSocket('ws://127.0.0.1:8000/ws/market-feed');
+    ws = new WebSocket('wss://tradepro-21q3.onrender.com/ws/market-feed');
 
             ws.onopen = () => {
                 const status = document.getElementById('connection-status');
