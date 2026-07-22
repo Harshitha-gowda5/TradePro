@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VertexTrade Pro - High-Frequency Trading Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-[#0b0e14] text-gray-100 min-h-screen font-sans selection:bg-indigo-500 selection:text-white">
+
+    <div id="auth-screen" class="fixed inset-0 z-50 flex items-center justify-center bg-[#0b0e14] px-4">
+        <div class="bg-[#121620] p-8 rounded-2xl border border-gray-800 w-full max-w-md shadow-2xl transition-all">
+            <div class="text-center mb-8">
+                <div class="inline-flex items-center justify-center w-14 h-14 rounded-full bg-indigo-500/10 text-indigo-400 mb-3">
+                    <i class="fa-solid fa-bolt-lightning text-2xl"></i>
+                </div>
+                <h2 class="text-2xl font-bold tracking-tight">Welcome to VertexTrade Pro</h2>
+                <p class="text-gray-400 text-xs mt-1">Institutional Order Matching & Quant Analytics Engine</p>
+            </div>
+            <form id="login-form" onsubmit="handleLogin(event)" class="space-y-5">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">User ID / Terminal Code</label>
+                    <input type="text" id="username" required value="HARSHITHA_QUANT" class="w-full bg-[#171d2c] border border-gray-800 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-indigo-500 text-white font-mono">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Secure Passcode</label>
+                    <input type="password" id="password" required value="••••••••" class="w-full bg-[#171d2c] border border-gray-800 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-indigo-500 text-white">
+                </div>
+                <button type="submit" class="w-full bg-indigo-500 hover:bg-indigo-600 active:scale-[0.99] text-white font-semibold py-3 rounded-lg text-sm transition-all shadow-lg shadow-indigo-500/20 mt-2">
+                    Initialize Terminal Session
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div id="app-screen" class="hidden min-h-screen flex flex-col pb-20 lg:pb-0 lg:pl-64">
+        
+        <nav class="fixed bottom-0 left-0 right-0 lg:top-0 lg:right-auto lg:w-64 bg-[#121620] border-t lg:border-t-0 lg:border-r border-gray-800 z-40 flex lg:flex-col justify-around lg:justify-start p-2 lg:p-6 transition-all">
+            <div class="hidden lg:flex items-center gap-3 mb-10 px-2">
+                <i class="fa-solid fa-bolt-lightning text-indigo-400 text-xl"></i>
+                <span class="text-lg font-bold tracking-wider text-white">VERTEX PRO</span>
+                <span class="text-[9px] bg-emerald-500/10 text-emerald-400 px-1.5 py-0.5 rounded border border-emerald-500/20 font-mono">LEME-v2</span>
+            </div>
+
+            <div class="flex lg:flex-col w-full justify-around lg:justify-start gap-1 lg:space-y-2">
+                <button onclick="switchTab('home')" id="tab-btn-home" class="flex flex-col lg:flex-row items-center gap-1 lg:gap-4 px-4 py-2 lg:py-3 rounded-xl text-xs lg:text-sm font-medium w-full text-indigo-400 bg-indigo-500/10 border-l-2 border-indigo-500 lg:border-l-4">
+                    <i class="fa-solid fa-house text-base w-5 text-center"></i> <span>Home</span>
+                </button>
+                <button onclick="switchTab('watchlist')" id="tab-btn-watchlist" class="flex flex-col lg:flex-row items-center gap-1 lg:gap-4 px-4 py-2 lg:py-3 rounded-xl text-xs lg:text-sm font-medium w-full text-gray-400 hover:bg-[#171d2c] hover:text-white">
+                    <i class="fa-solid fa-list-ul text-base w-5 text-center"></i> <span>Watchlist</span>
+                </button>
+                <button onclick="switchTab('orders')" id="tab-btn-orders" class="flex flex-col lg:flex-row items-center gap-1 lg:gap-4 px-4 py-2 lg:py-3 rounded-xl text-xs lg:text-sm font-medium w-full text-gray-400 hover:bg-[#171d2c] hover:text-white">
+                    <i class="fa-solid fa-clock-rotate-left text-base w-5 text-center"></i> <span>Orders</span>
+                </button>
+                <button onclick="switchTab('portfolio')" id="tab-btn-portfolio" class="flex flex-col lg:flex-row items-center gap-1 lg:gap-4 px-4 py-2 lg:py-3 rounded-xl text-xs lg:text-sm font-medium w-full text-gray-400 hover:bg-[#171d2c] hover:text-white">
+                    <i class="fa-solid fa-briefcase text-base w-5 text-center"></i> <span>Portfolio</span>
+                </button>
+            </div>
+
+            <div class="hidden lg:flex flex-col mt-auto border-t border-gray-800 pt-4 px-2">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-xs font-bold text-white">HQ</div>
+                    <div>
+                        <p class="text-xs font-bold text-white" id="user-display-name">HARSHITHA_QUANT</p>
+                        <span class="text-[10px] text-emerald-400 flex items-center gap-1"><span class="w-1.5 h-1.5 bg-emerald-400 rounded-full inline-block animate-pulse"></span> Terminal Active</span>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <header class="bg-[#121620] border-b border-gray-800 px-6 py-4 flex flex-wrap items-center justify-between gap-4 sticky top-0 z-30">
+            <div class="flex items-center gap-6 overflow-x-auto no-scrollbar py-1">
+                <div>
+                    <span class="text-[10px] font-bold text-gray-400 block uppercase">NIFTY 50</span>
+                    <span class="text-xs font-bold text-emerald-400 font-mono">24,270.85 <span class="text-[10px] font-medium">(+0.39%)</span></span>
+                </div>
+                <div class="border-l border-gray-800 h-6"></div>
+                <div>
+                    <span class="text-[10px] font-bold text-gray-400 block uppercase">BANKNIFTY</span>
+                    <span class="text-xs font-bold text-rose-400 font-mono">57,938.50 <span class="text-[10px] font-medium">(-0.16%)</span></span>
+                </div>
+                <div class="border-l border-gray-800 h-6"></div>
+                <div>
+                    <span class="text-[10px] font-bold text-gray-400 block uppercase">SENSEX</span>
+                    <span class="text-xs font-bold text-emerald-400 font-mono">77,763.91 <span class="text-[10px] font-medium">(+0.34%)</span></span>
+                </div>
+            </div>
+            <div id="connection-status" class="px-3 py-1 rounded-full text-[11px] font-semibold bg-rose-500/10 text-rose-400 border border-rose-500/20 font-mono">
+                <i class="fa-solid fa-circle-nodes mr-1.5"></i>Engine Pipeline Offline
+            </div>
+        </header>
+
+        <main class="p-4 lg:p-8 flex-1 max-w-7xl w-full mx-auto">
+            
+            <section id="view-home" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-[#121620] p-6 rounded-2xl border border-gray-800">
+                        <span class="text-xs text-gray-400 font-medium block">Total Net Asset Value</span>
+                        <h3 class="text-3xl font-extrabold text-white font-mono mt-1">₹1,84,755.00</h3>
+                        <span class="text-xs text-emerald-400 font-medium mt-1 inline-block"><i class="fa-solid fa-caret-up mr-1"></i>+₹3,363.36 (1.85%) Today</span>
+                    </div>
+                    <div class="bg-[#121620] p-6 rounded-2xl border border-gray-800 flex items-center justify-between">
+                        <div>
+                            <span class="text-xs text-gray-400 font-medium block">Allocated Equity Capital</span>
+                            <h4 class="text-xl font-bold text-white font-mono mt-1">₹1.71 Lakhs</h4>
+                        </div>
+                        <div class="w-12 h-12 bg-indigo-500/10 border border-indigo-500/20 rounded-xl flex items-center justify-center text-indigo-400 text-lg"><i class="fa-solid fa-chart-pie"></i></div>
+                    </div>
+                    <div class="bg-[#121620] p-6 rounded-2xl border border-gray-800 flex items-center justify-between">
+                        <div>
+                            <span class="text-xs text-gray-400 font-medium block">Available Trading Margin</span>
+                            <h4 class="text-xl font-bold text-white font-mono mt-1">₹930.00</h4>
+                        </div>
+                        <div class="w-12 h-12 bg-amber-500/10 border border-amber-500/20 rounded-xl flex items-center justify-center text-amber-400 text-lg"><i class="fa-solid fa-wallet"></i></div>
+                    </div>
+                </div>
+
+                <div class="bg-[#121620] p-6 rounded-2xl border border-gray-800">
+                    <h3 class="text-sm font-bold tracking-wider text-gray-400 uppercase mb-4">Core System Architectural Vectors</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div class="p-4 bg-[#171d2c] rounded-xl border border-gray-800">
+                            <span class="text-[10px] uppercase font-bold text-gray-400">Order Matching Paradigm</span>
+                            <p class="text-xs font-semibold text-white mt-1">Lock-Free Concurrent Memory Queues</p>
+                        </div>
+                        <div class="p-4 bg-[#171d2c] rounded-xl border border-gray-800">
+                            <span class="text-[10px] uppercase font-bold text-gray-400">Algorithmic Inference Speed</span>
+                            <p class="text-xs font-semibold text-white mt-1">Sub-Millisecond Time-Series Windows</p>
+                        </div>
+                        <div class="p-4 bg-[#171d2c] rounded-xl border border-gray-800">
+                            <span class="text-[10px] uppercase font-bold text-gray-400">Concurrency Safeties</span>
+                            <p class="text-xs font-semibold text-white mt-1">Java Atomic CAS Memory Structs</p>
+                        </div>
+                        <div class="p-4 bg-[#171d2c] rounded-xl border border-gray-800">
+                            <span class="text-[10px] uppercase font-bold text-gray-400">Network Transport Layer</span>
+                            <p class="text-xs font-semibold text-white mt-1">Asynchronous JSON WebSockets</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="view-watchlist" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
+                <div class="bg-[#121620] rounded-2xl border border-gray-800 p-4 h-fit space-y-3">
+                    <div class="flex items-center justify-between px-2 mb-2">
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-gray-400">Core Watchlist (NSE/BSE Tokens)</h3>
+                        <span class="text-[10px] font-mono text-indigo-400">Streaming Live</span>
+                    </div>
+                    
+                    <div id="watchlist-container" class="space-y-2">
+                        <div onclick="selectTicker('RELIANCE')" id="ticker-card-RELIANCE" class="p-4 bg-[#171d2c] border-2 border-indigo-500 rounded-xl cursor-pointer transition-all flex justify-between items-center">
+                            <div>
+                                <span class="font-bold text-sm block text-white">RELIANCE</span>
+                                <span class="text-[10px] text-gray-400 font-medium">Reliance Industries Ltd.</span>
+                            </div>
+                            <div class="text-right">
+                                <span id="ticker-price-RELIANCE" class="font-bold font-mono text-sm block text-indigo-400">₹2500.00</span>
+                                <span class="text-[10px] font-semibold text-emerald-400 font-mono">+1.12%</span>
+                            </div>
+                        </div>
+                        <div onclick="selectTicker('TCS')" id="ticker-card-TCS" class="p-4 bg-[#171d2c] border border-gray-800 rounded-xl cursor-pointer hover:border-gray-700 transition-all flex justify-between items-center">
+                            <div>
+                                <span class="font-bold text-sm block text-white">TCS</span>
+                                <span class="text-[10px] text-gray-400 font-medium">Tata Consultancy Services</span>
+                            </div>
+                            <div class="text-right">
+                                <span id="ticker-price-TCS" class="font-bold font-mono text-sm block text-gray-300">₹3500.00</span>
+                                <span class="text-[10px] font-semibold text-rose-400 font-mono">-0.45%</span>
+                            </div>
+                        </div>
+                        <div onclick="selectTicker('INFY')" id="ticker-card-INFY" class="p-4 bg-[#171d2c] border border-gray-800 rounded-xl cursor-pointer hover:border-gray-700 transition-all flex justify-between items-center">
+                            <div>
+                                <span class="font-bold text-sm block text-white">INFY</span>
+                                <span class="text-[10px] text-gray-400 font-medium">Infosys Limited</span>
+                            </div>
+                            <div class="text-right">
+                                <span id="ticker-price-INFY" class="font-bold font-mono text-sm block text-gray-300">₹1420.00</span>
+                                <span class="text-[10px] font-semibold text-emerald-400 font-mono">+2.04%</span>
+                            </div>
+                        </div>
+                        <div onclick="selectTicker('HDFCBANK')" id="ticker-card-HDFCBANK" class="p-4 bg-[#171d2c] border border-gray-800 rounded-xl cursor-pointer hover:border-gray-700 transition-all flex justify-between items-center">
+                            <div>
+                                <span class="font-bold text-sm block text-white">HDFCBANK</span>
+                                <span class="text-[10px] text-gray-400 font-medium">HDFC Bank Limited</span>
+                            </div>
+                            <div class="text-right">
+                                <span id="ticker-price-HDFCBANK" class="font-bold font-mono text-sm block text-gray-300">₹1680.00</span>
+                                <span class="text-[10px] font-semibold text-gray-400 font-mono">0.00%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-2 space-y-6">
+                    <div class="bg-[#121620] p-6 rounded-2xl border border-gray-800 shadow-xl">
+                        <div class="flex justify-between items-center mb-4">
+                            <div>
+                                <span id="active-ticker-display" class="text-2xl font-black text-white">RELIANCE</span>
+                                <span id="active-price-display" class="text-xl font-bold font-mono text-indigo-400 ml-3">₹2,500.00</span>
+                            </div>
+                            <span class="text-xs text-gray-500 font-mono">Window Size: 20 ticks</span>
+                        </div>
+                        <div class="relative w-full h-64">
+                            <canvas id="realtimeChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        
+                        <div class="bg-[#121620] p-5 rounded-2xl border border-gray-800">
+                            <h4 class="text-xs font-bold uppercase text-gray-400 tracking-wider mb-3">Live Order Depth (L2 Microstructure)</h4>
+                            <div class="space-y-1.5 text-xs font-mono">
+                                <div class="grid grid-cols-3 text-gray-500 border-b border-gray-800 pb-1.5 mb-2 font-sans font-bold">
+                                    <span>Bid Quantity</span><span>Price (₹)</span><span class="text-right">Ask Quantity</span>
+                                </div>
+                                <div class="grid grid-cols-3 text-emerald-400 bg-emerald-500/5 p-1 rounded">
+                                    <span>1,420</span><span id="bid-p1">2498.50</span><span class="text-right text-gray-600">-</span>
+                                </div>
+                                <div class="grid grid-cols-3 text-emerald-400">
+                                    <span>850</span><span id="bid-p2">2497.00</span><span class="text-right text-gray-600">-</span>
+                                </div>
+                                <div class="grid grid-cols-3 text-emerald-400">
+                                    <span>3,110</span><span id="bid-p3">2495.20</span><span class="text-right text-gray-600">-</span>
+                                </div>
+                                <div class="border-t border-gray-800/60 my-1"></div>
+                                <div class="grid grid-cols-3 text-rose-400 bg-rose-500/5 p-1 rounded">
+                                    <span class="text-gray-600">-</span><span id="ask-p1">2501.20</span><span class="text-right">930</span>
+                                </div>
+                                <div class="grid grid-cols-3 text-rose-400">
+                                    <span class="text-gray-600">-</span><span id="ask-p2">2503.00</span><span class="text-right">1,740</span>
+                                </div>
+                                <div class="grid grid-cols-3 text-rose-400">
+                                    <span class="text-gray-600">-</span><span id="ask-p3">2504.85</span><span class="text-right">620</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-[#121620] p-5 rounded-2xl border border-gray-800 flex flex-col justify-between">
+                            <div>
+                                <h4 class="text-xs font-bold uppercase text-gray-400 tracking-wider mb-2">Automated Machine Learning Signal</h4>
+                                <div id="ai-signal-badge" class="inline-block px-3 py-1 rounded-md font-bold text-xs tracking-wide bg-gray-800 text-gray-300 border border-gray-700">
+                                    SCANNING PATTERNS...
+                                </div>
+                                <p id="ai-action-text" class="text-xs text-gray-400 italic mt-3 leading-relaxed">Evaluating systemic directional gradients via statistical momentum vector algorithms...</p>
+                            </div>
+                            
+                            <div class="grid grid-cols-2 gap-3 mt-4">
+                                <button onclick="triggerOrder('BUY')" class="bg-emerald-500 hover:bg-emerald-600 font-bold text-xs py-2.5 rounded-lg text-white transition-all transform active:scale-95 shadow-md shadow-emerald-500/10">
+                                    Instant Buy Order
+                                </button>
+                                <button onclick="triggerOrder('SELL')" class="bg-rose-500 hover:bg-rose-600 font-bold text-xs py-2.5 rounded-lg text-white transition-all transform active:scale-95 shadow-md shadow-rose-500/10">
+                                    Instant Sell Order
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+
+            <section id="view-orders" class="hidden space-y-4">
+                <div class="bg-[#121620] p-6 rounded-2xl border border-gray-800">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h3 class="text-base font-bold text-white">Java Low-Latency Concurrency Ledger</h3>
+                            <p class="text-xs text-gray-400 mt-0.5">Simulated Sub-Millisecond Order Execution Pipeline Tracking</p>
+                        </div>
+                        <span class="text-xs font-mono bg-indigo-500/10 text-indigo-400 px-2.5 py-1 rounded border border-indigo-500/20">Lock-Free CAS Books</span>
+                    </div>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="text-xs font-bold text-gray-500 uppercase tracking-wider border-b border-gray-800 pb-2">
+                                    <th class="pb-3">Timestamp</th>
+                                    <th class="pb-3">Execution ID</th>
+                                    <th class="pb-3">Ticker</th>
+                                    <th class="pb-3">Side</th>
+                                    <th class="pb-3">Quantity</th>
+                                    <th class="pb-3 text-right">Match Price</th>
+                                </tr>
+                            </thead>
+                            <tbody id="execution-log-table" class="text-xs font-mono divide-y divide-gray-800/50">
+                                <tr class="text-gray-400">
+                                    <td class="py-3">21:14:02.104</td>
+                                    <td>TX-940251</td>
+                                    <td class="font-bold text-white">RELIANCE</td>
+                                    <td><span class="text-emerald-400 font-semibold">BUY</span></td>
+                                    <td>120 Shares</td>
+                                    <td class="text-right text-gray-300">₹2451.00</td>
+                                </tr>
+                                <tr class="text-gray-400">
+                                    <td class="py-3">21:14:02.098</td>
+                                    <td>TX-940250</td>
+                                    <td class="font-bold text-white">TCS</td>
+                                    <td><span class="text-rose-400 font-semibold">SELL</span></td>
+                                    <td>80 Shares</td>
+                                    <td class="text-right text-gray-300">₹3900.00</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section id="view-portfolio" class="hidden bg-[#121620] p-6 rounded-2xl border border-gray-800">
+                <h3 class="text-base font-bold text-white mb-4">Current Asset Allocations</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead>
+                            <tr class="text-xs text-gray-500 uppercase border-b border-gray-800 pb-2">
+                                <th class="pb-3">Instrument</th>
+                                <th class="pb-3">Average Price</th>
+                                <th class="pb-3">Quantity</th>
+                                <th class="pb-3 text-right">Current Valuation</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-xs font-medium divide-y divide-gray-800/40">
+                            <tr>
+                                <td class="py-3 font-bold text-white">HDFCBANK <span class="text-[10px] text-gray-500 font-mono block">NSE / EQ</span></td>
+                                <td class="font-mono text-gray-300">₹795.00</td>
+                                <td class="font-mono text-gray-300">100</td>
+                                <td class="font-mono text-emerald-400 text-right">₹80,105.00</td>
+                            </tr>
+                            <tr>
+                                <td class="py-3 font-bold text-white">BHARTIARTL <span class="text-[10px] text-gray-500 font-mono block">NSE / EQ</span></td>
+                                <td class="font-mono text-gray-300">₹1,890.00</td>
+                                <td class="font-mono text-gray-300">48</td>
+                                <td class="font-mono text-emerald-400 text-right">₹91,699.20</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        let ws;
+        let selectedTicker = "RELIANCE";
+        const maxDataPoints = 20;
+
+        // AUTH CONTEXT LOCK MECHANISM
+        function handleLogin(event) {
+            event.preventDefault();
+            document.getElementById('auth-screen').classList.add('opacity-0');
+            setTimeout(() => {
+                document.getElementById('auth-screen').style.display = 'none';
+                document.getElementById('app-screen').classList.remove('hidden');
+                initializeWebSocket();
+            }, 300);
+        }
+
+        // NAVIGATION SWITCH LOGIC (SPA TAB STATES)
+        function switchTab(tabId) {
+            ['home', 'watchlist', 'orders', 'portfolio'].forEach(t => {
+                document.getElementById(`view-${t}`).classList.add('hidden');
+                document.getElementById(`tab-btn-${t}`).className = "flex flex-col lg:flex-row items-center gap-1 lg:gap-4 px-4 py-2 lg:py-3 rounded-xl text-xs lg:text-sm font-medium w-full text-gray-400 hover:bg-[#171d2c] hover:text-white";
+            });
+            document.getElementById(`view-${tabId}`).classList.remove('hidden');
+            document.getElementById(`tab-btn-${tabId}`).className = "flex flex-col lg:flex-row items-center gap-1 lg:gap-4 px-4 py-2 lg:py-3 rounded-xl text-xs lg:text-sm font-medium w-full text-indigo-400 bg-indigo-500/10 border-l-2 border-indigo-500 lg:border-l-4";
+        }
+
+        function selectTicker(ticker) {
+            ['RELIANCE', 'TCS', 'INFY', 'HDFCBANK'].forEach(t => {
+                document.getElementById(`ticker-card-${t}`).className = "p-4 bg-[#171d2c] border border-gray-800 rounded-xl cursor-pointer hover:border-gray-700 transition-all flex justify-between items-center";
+            });
+            document.getElementById(`ticker-card-${ticker}`).className = "p-4 bg-[#171d2c] border-2 border-indigo-500 rounded-xl cursor-pointer transition-all flex justify-between items-center";
+            selectedTicker = ticker;
+            document.getElementById('active-ticker-display').textContent = ticker;
+            chart.data.labels = [];
+            chart.data.datasets[0].data = [];
+            chart.data.datasets[0].pointBackgroundColor = [];
+            chart.update();
+        }
+
+        // VOLATILE STREAM VISUALIZATION COMPONENT
+        const ctx = document.getElementById('realtimeChart').getContext('2d');
+        const chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Calculated Feed Spot Value (₹)',
+                    data: [],
+                    borderColor: '#818cf8',
+                    backgroundColor: 'rgba(129, 140, 248, 0.02)',
+                    borderWidth: 2,
+                    tension: 0.15,
+                    fill: true,
+                    pointBackgroundColor: [],
+                    pointRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: { grid: { color: '#171d2c' }, ticks: { color: '#4b5563', font: { family: 'monospace' } } },
+                    y: { grid: { color: '#171d2c' }, ticks: { color: '#4b5563', font: { family: 'monospace' } } }
+                },
+                plugins: { legend: { display: false } }
+            }
+        });
+
+        // RE-INITIALIZE REAL-TIME DEPTH MOCK GRAPH MANIFOLDS
+        function updateOrderBook(basePrice) {
+            document.getElementById('bid-p1').textContent = (basePrice - 0.75).toFixed(2);
+            document.getElementById('bid-p2').textContent = (basePrice - 1.40).toFixed(2);
+            document.getElementById('bid-p3').textContent = (basePrice - 2.85).toFixed(2);
+            document.getElementById('ask-p1').textContent = (basePrice + 0.65).toFixed(2);
+            document.getElementById('ask-p2').textContent = (basePrice + 1.95).toFixed(2);
+            document.getElementById('ask-p3').textContent = (basePrice + 3.10).toFixed(2);
+        }
+
+        // TRIGGER MOCK INTERACTION WITH CORE JAVA ENGINE SUBMISSION
+        // TRIGGER ACTUAL INTERACTION WITH CORE BACKEND AND JAVA ENGINE
+        function triggerOrder(side) {
+            const price = parseFloat(document.getElementById('active-price-display').textContent.replace('₹', ''));
+            const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }) + "." + Math.floor(Math.random() * 1000);
+            const execId = "TX-" + Math.floor(100000 + Math.random() * 900000);
+            
+            // 1. UPDATE THE VISUAL TABLE LOGS IMMEDIATELY
+            const logTable = document.getElementById('execution-log-table');
+            const newRow = document.createElement('tr');
+            newRow.className = "text-gray-300 bg-indigo-500/5 font-mono";
+            newRow.innerHTML = `
+                <td class="py-3 text-indigo-400">${timestamp}</td>
+                <td>${execId}</td>
+                <td class="font-bold text-white">${selectedTicker}</td>
+                <td><span class="${side === 'BUY' ? 'text-emerald-400' : 'text-rose-400'} font-bold">${side}</span></td>
+                <td>50 Shares</td>
+                <td class="text-right font-bold text-indigo-300">₹${price.toFixed(2)}</td>
+            `;
+            logTable.insertBefore(newRow, logTable.firstChild);
+
+            // 2. THE CRITICAL MISSING LINK: SHOOT THE ORDER TO PYTHON VIA WEBSOCKET
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                const orderPayload = {
+                    action: "SUBMIT_ORDER",
+                    ticker: selectedTicker,
+                    side: side,
+                    qty: 50,
+                    price: price
+                };
+                ws.send(JSON.stringify(orderPayload));
+                console.log("[FRONTEND] Order dispatched to Python WebSocket Gateway:", orderPayload);
+            } else {
+                alert("Cannot dispatch order: WebSocket pipeline is disconnected!");
+            }
+        }
+        // STABLE CONNECTIVITY LOOP OVER LOCAL NETWORKS
+        function initializeWebSocket() {
+            ws = new WebSocket('ws://127.0.0.1:8000/ws/market-feed');
+
+            ws.onopen = () => {
+                const status = document.getElementById('connection-status');
+                status.textContent = "Live Connected: LEME Thread Pooling Pool Active";
+                status.className = "px-3 py-1 rounded-full text-[11px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono";
+            };
+
+            ws.onmessage = (event) => {
+                const payload = JSON.parse(event.data);
+                const ticker = payload.symbol;
+                const price = payload.live_price;
+                
+                // Update specific watchlist element text records independently
+                const targetTickerLabel = document.getElementById(`ticker-price-${ticker}`);
+                if(targetTickerLabel) targetTickerLabel.textContent = `₹${price.toFixed(2)}`;
+
+                // Handle global view adjustments for targeted instruments
+                if (ticker === selectedTicker) {
+                    document.getElementById('active-price-display').textContent = `₹${price.toFixed(2)}`;
+                    document.getElementById('ai-action-text').textContent = payload.ai_action_plan;
+                    updateOrderBook(price);
+
+                    const aiBadge = document.getElementById('ai-signal-badge');
+                    let pointColor = '#818cf8';
+
+                    if (payload.ai_forecast === "BUY") {
+                        aiBadge.textContent = "STRONG BUY SIGNAL (MOMENTUM PEAK)";
+                        aiBadge.className = "inline-block px-3 py-1 rounded-md font-bold text-xs tracking-wide bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
+                        pointColor = '#10b981';
+                    } else if (payload.ai_forecast === "SELL") {
+                        aiBadge.textContent = "ALERT: REVERSAL CRITICAL DETECTED (SELL)";
+                        aiBadge.className = "inline-block px-3 py-1 rounded-md font-bold text-xs tracking-wide bg-rose-500/10 text-rose-400 border border-rose-500/20";
+                        pointColor = '#f43f5e';
+                    } else {
+                        aiBadge.textContent = "MARKET CONSOLIDATION (HOLD)";
+                        aiBadge.className = "inline-block px-3 py-1 rounded-md font-bold text-xs tracking-wide bg-gray-800 text-gray-400 border border-gray-700";
+                    }
+
+                    const timeString = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+                    chart.data.labels.push(timeString);
+                    chart.data.datasets[0].data.push(price);
+                    chart.data.datasets[0].pointBackgroundColor.push(pointColor);
+
+                    if (chart.data.labels.length > maxDataPoints) {
+                        chart.data.labels.shift();
+                        chart.data.datasets[0].data.shift();
+                        chart.data.datasets[0].pointBackgroundColor.shift();
+                    }
+                    chart.update('none');
+                }
+            };
+
+            ws.onclose = () => {
+                const status = document.getElementById('connection-status');
+                status.textContent = "Engine Pipeline Offline";
+                status.className = "px-3 py-1 rounded-full text-[11px] font-semibold bg-rose-500/10 text-rose-400 border border-rose-500/20 font-mono";
+                setTimeout(initializeWebSocket, 3000); // Attempt continuous restoration loops every 3 seconds
+            };
+        }
+    </script>
+</body>
+</html>
